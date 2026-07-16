@@ -36,7 +36,8 @@
   }
   .mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;}
   button{font-family:inherit;-webkit-appearance:none;appearance:none;}
-  input,select{font-family:inherit;-webkit-appearance:none;appearance:none;}
+  input:not([type="checkbox"]):not([type="radio"]), select{font-family:inherit;-webkit-appearance:none;appearance:none;}
+  input[type="checkbox"]{-webkit-appearance:auto;appearance:auto;}
 
   /* ===== MOBILE-FIRST BASE (target: iPhone-width screens) ===== */
 
@@ -179,35 +180,80 @@
   .form-msg{font-size:13px;color:var(--text-dim);text-align:center;}
   .form-msg.error{color:#d9776b;}
 
-  /* logged items */
+  .entry-datetime-row{display:flex;gap:10px;margin-bottom:14px;}
+  .entry-datetime-row .field{flex:1;margin:0;}
+
+  .promo-check{
+    display:flex;align-items:center;gap:10px;
+    padding:6px 2px;
+  }
+  .promo-check input[type="checkbox"]{
+    width:24px;height:24px;accent-color:var(--accent);flex-shrink:0;
+  }
+  .promo-check label{font-size:13.5px;color:var(--text-dim);}
+
+  /* logged items: one ticket = one entry, containing multiple item lines */
   .tickets{display:flex;flex-direction:column;gap:10px;}
   .ticket{
     background:var(--ticket-bg);color:var(--ticket-text);border-radius:12px;
     display:flex;position:relative;box-shadow:0 2px 8px rgba(0,0,0,0.3);overflow:hidden;
   }
-  .ticket .stub-left{width:12px;flex-shrink:0;}
-  .ticket.tools .stub-left{background:var(--accent);}
-  .ticket.outdoor .stub-left{background:var(--accent-2);}
-  .ticket .stub-body{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
-  .ticket .t-main{display:flex;flex-direction:column;gap:3px;}
-  .ticket .t-name{font-weight:800;font-size:16px;line-height:1.25;}
-  .ticket .t-meta{font-size:12px;color:var(--ticket-text-dim);}
-  .ticket .t-meta .cat-pill{
-    display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;
-    padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:800;
+  .ticket .stub-left{width:12px;flex-shrink:0;background:var(--accent);align-self:stretch;}
+  .ticket .stub-body{flex:1;padding:14px 16px;min-width:0;}
+
+  .entry-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .entry-header .e-datetime{font-weight:800;font-size:14.5px;}
+  .entry-header .e-meta{font-size:11.5px;color:var(--ticket-text-dim);margin-top:2px;}
+  .entry-header .e-total{font-weight:800;font-size:16px;white-space:nowrap;}
+  .entry-del-btn{
+    background:none;border:none;color:#b5aa8f;font-size:13px;cursor:pointer;
+    padding:6px;line-height:1;flex-shrink:0;
   }
-  .ticket.tools .cat-pill{background:var(--accent);color:#20242A;}
-  .ticket.outdoor .cat-pill{background:var(--accent-2);color:#101820;}
-  .ticket .t-right{display:flex;align-items:center;justify-content:space-between;}
-  .ticket .t-value{font-size:19px;font-weight:800;}
-  .ticket .icon-btn{
+  .entry-del-btn:active{color:#8a2f2f;}
+
+  .item-line{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:9px 0;border-top:1px dashed #cfc7b4;
+  }
+  .item-line:first-of-type{border-top:1px solid #cfc7b4;margin-top:8px;padding-top:11px;}
+  .item-line .i-left{display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+  .item-line .i-name{font-weight:700;font-size:14.5px;overflow-wrap:anywhere;}
+  .item-line .promo-badge{font-size:14px;flex-shrink:0;}
+  .item-line .cat-pill{
+    display:inline-block;font-size:9.5px;text-transform:uppercase;letter-spacing:0.05em;
+    padding:2px 6px;border-radius:4px;font-weight:800;flex-shrink:0;
+  }
+  .item-line.tools .cat-pill{background:var(--accent);color:#20242A;}
+  .item-line.outdoor .cat-pill{background:var(--accent-2);color:#101820;}
+  .item-line .i-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .item-line .i-value{font-weight:800;font-size:14.5px;min-width:56px;text-align:right;}
+  .icon-btn{
     background:none;border:1px solid #cfc7b4;color:#6B6558;border-radius:8px;
-    width:36px;height:36px;font-size:14px;cursor:pointer;line-height:1;margin-left:8px;
+    width:32px;height:32px;font-size:13px;cursor:pointer;line-height:1;flex-shrink:0;
   }
-  .ticket .icon-btn.del:active{border-color:#8a2f2f;color:#8a2f2f;}
+  .icon-btn.del:active{border-color:#8a2f2f;color:#8a2f2f;}
 
   .day-heading{font-size:11.5px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:16px 0 8px;}
   .day-heading:first-child{margin-top:0;}
+
+  /* danger zone: isolated + visually distinct so it can't be hit while logging entries */
+  .danger-zone{
+    border:1.5px solid rgba(163,63,56,0.4);
+    border-radius:14px;
+    padding:16px;
+    margin-top:36px;
+    background:rgba(163,63,56,0.06);
+  }
+  .danger-zone .dz-label{
+    font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;
+    color:#c96a5f;margin-bottom:10px;
+  }
+  .delete-event-btn{
+    width:100%;background:transparent;border:1.5px solid #a33f38;color:#d9776b;
+    font-weight:800;text-transform:uppercase;letter-spacing:0.05em;font-size:13px;
+    padding:14px;border-radius:10px;cursor:pointer;min-height:48px;
+  }
+  .delete-event-btn:active{background:rgba(163,63,56,0.15);}
 
   footer{text-align:center;color:var(--text-dim);font-size:11.5px;margin-top:26px;padding:0 4px;}
 
@@ -264,7 +310,7 @@
   let events = [];
   let view = 'home'; // 'home' | 'event'
   let currentEventId = null;
-  let stagingRows = [];
+  let staging = null; // { date, time, rows: [...] }
   let showNewEventForm = false;
 
   const app = document.getElementById('app');
@@ -281,6 +327,13 @@
   function fmtMoney(n){
     return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
   }
+  function fmtTime(t){
+    if(!t) return '';
+    const [h,m] = t.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${h12}:${pad(m)} ${period}`;
+  }
   function catClass(cat){ return cat === 'Outdoor Power' ? 'outdoor' : 'tools'; }
   function uid(){ return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
 
@@ -288,11 +341,26 @@
     try{
       const raw = window.localStorage.getItem(STORAGE_KEY);
       events = raw ? JSON.parse(raw) : [];
+      events.forEach(migrateEvent);
     }catch(e){
       console.error('Could not read saved data', e);
       events = [];
     }
     render();
+  }
+
+  // migrate old "one item = one date/time" records into the new
+  // "one entry (date/time) holds multiple items" structure, so existing
+  // saved data isn't lost when the data model changes.
+  function migrateEvent(ev){
+    if(ev.entries) return;
+    ev.entries = (ev.items || []).map(it => ({
+      id: it.id || uid(),
+      date: it.date,
+      time: it.time,
+      items: [{ id: uid(), category: it.category, itemName: it.itemName, value: it.value, promo: false }]
+    }));
+    delete ev.items;
   }
 
   function saveEvents(){
@@ -304,23 +372,26 @@
     }
   }
 
-  function blankRow(){
-    return { id: uid(), date: todayStr(), time: nowTimeStr(), category: 'Tools', itemName: '', value: '' };
+  function blankItemRow(){
+    return { id: uid(), category: 'Tools', itemName: '', value: '', promo: false };
   }
 
-  function newEventDefaultView(ev){
+  function freshStaging(){
+    return { date: todayStr(), time: nowTimeStr(), rows: [ blankItemRow() ] };
+  }
+
+  function eventTotal(ev){
+    return (ev.entries||[]).reduce((s,en)=> s + en.items.reduce((s2,i)=>s2+i.value,0), 0);
+  }
+
+  function openEvent(ev){
     currentEventId = ev.id;
     view = 'event';
-    stagingRows = [ blankRow() ];
+    staging = freshStaging();
   }
 
   /* ---------------- HOME ---------------- */
   function renderHome(){
-    const totalStr = e => {
-      const t = e.items.reduce((s,i)=>s+i.value,0);
-      return fmtMoney(t);
-    };
-
     app.innerHTML = `
       <header>
         <div class="brand-mark">
@@ -363,21 +434,23 @@
         <div class="event-list">
           ${events.length === 0
             ? '<div class="empty-note">No events yet — create one to start logging sales.</div>'
-            : events.slice().sort((a,b)=> b.date.localeCompare(a.date)).map(e => `
+            : events.slice().sort((a,b)=> b.date.localeCompare(a.date)).map(e => {
+                const itemCount = (e.entries||[]).reduce((s,en)=>s+en.items.length,0);
+                return `
               <button class="event-card" data-id="${e.id}">
                 <div class="stub"></div>
                 <div class="body">
                   <div>
                     <div class="name">${escapeHtml(e.name)}</div>
-                    <div class="date">${e.date} · ${e.items.length} item${e.items.length===1?'':'s'}</div>
+                    <div class="date">${e.date} · ${itemCount} item${itemCount===1?'':'s'}</div>
                   </div>
                   <div>
-                    <div class="total mono">${totalStr(e)}</div>
+                    <div class="total mono">${fmtMoney(eventTotal(e))}</div>
                     <div class="count">${e.assocCount||0} assoc · ${e.custCount||0} cust sessions</div>
                   </div>
                 </div>
               </button>
-            `).join('')
+            `;}).join('')
           }
         </div>
       </div>
@@ -436,11 +509,11 @@
         const name = document.getElementById('ne-name').value.trim();
         const date = document.getElementById('ne-date').value;
         if(!name){ document.getElementById('ne-name').focus(); return; }
-        const ev = { id: uid(), name, date: date || todayStr(), assocCount:0, custCount:0, items: [] };
+        const ev = { id: uid(), name, date: date || todayStr(), assocCount:0, custCount:0, entries: [] };
         events.push(ev);
         saveEvents();
         showNewEventForm = false;
-        newEventDefaultView(ev);
+        openEvent(ev);
         render();
       });
       document.getElementById('cancelEventBtn').addEventListener('click', () => {
@@ -452,7 +525,7 @@
     app.querySelectorAll('.event-card').forEach(card => {
       card.addEventListener('click', () => {
         const ev = events.find(e => e.id === card.getAttribute('data-id'));
-        if(ev) newEventDefaultView(ev);
+        if(ev) openEvent(ev);
         render();
       });
     });
@@ -463,15 +536,21 @@
     d.textContent = str;
     return d.innerHTML;
   }
+  function escapeAttr(str){
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  }
 
   /* ---------------- EVENT DETAIL ---------------- */
   function renderEvent(){
     const ev = events.find(e => e.id === currentEventId);
     if(!ev){ view = 'home'; render(); return; }
+    if(!ev.entries) ev.entries = [];
 
-    const totalAll = ev.items.reduce((s,i)=>s+i.value,0);
-    const totalTools = ev.items.filter(i=>i.category==='Tools').reduce((s,i)=>s+i.value,0);
-    const totalOutdoor = ev.items.filter(i=>i.category==='Outdoor Power').reduce((s,i)=>s+i.value,0);
+    const allItems = ev.entries.flatMap(en => en.items);
+    const totalAll = allItems.reduce((s,i)=>s+i.value,0);
+    const totalTools = allItems.filter(i=>i.category==='Tools').reduce((s,i)=>s+i.value,0);
+    const totalOutdoor = allItems.filter(i=>i.category==='Outdoor Power').reduce((s,i)=>s+i.value,0);
+    const itemCount = allItems.length;
 
     app.innerHTML = `
       <div class="back-row">
@@ -482,7 +561,7 @@
           <h1>${escapeHtml(ev.name)}</h1>
           <span class="date-badge">${ev.date}</span>
         </div>
-        <div class="stamp">Status: <b>${ev.items.length} item${ev.items.length===1?'':'s'} logged</b></div>
+        <div class="stamp">Status: <b>${itemCount} item${itemCount===1?'':'s'} logged</b></div>
       </header>
 
       <div class="cards">
@@ -516,14 +595,18 @@
 
       <div class="panel">
         <h2>Add items</h2>
+        <div class="entry-datetime-row">
+          <div class="field"><label>Entry date</label><input type="date" id="stg-date" value="${staging.date}"></div>
+          <div class="field"><label>Entry time</label><input type="time" id="stg-time" value="${staging.time}"></div>
+        </div>
         <div id="stagingArea">
-          ${stagingRows.map((row, idx) => stageRowHtml(row, idx)).join('')}
+          ${staging.rows.map((row, idx) => stageRowHtml(row, idx)).join('')}
         </div>
         <div class="stage-actions">
           <div class="stage-actions-left">
             <button class="btn secondary small" id="addItemBtn">+ Add item</button>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
+          <div style="display:flex;flex-direction:column;align-items:stretch;gap:8px;">
             <span class="form-msg" id="formMsg"></span>
             <button class="btn" id="logEntryBtn">Log entry</button>
           </div>
@@ -533,8 +616,13 @@
       <div class="panel">
         <h2>Logged items</h2>
         <div class="tickets" id="ticketList">
-          ${ev.items.length === 0 ? '<div class="empty-note">No items logged yet for this event.</div>' : renderTickets(ev.items)}
+          ${ev.entries.length === 0 ? '<div class="empty-note">No items logged yet for this event.</div>' : renderEntryTickets(ev.entries)}
         </div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="dz-label">Danger zone</div>
+        <button class="delete-event-btn" id="deleteEventBtn">Delete this event</button>
       </div>
     `;
 
@@ -548,67 +636,118 @@
     document.getElementById('custPlus').addEventListener('click', () => { ev.custCount = (ev.custCount||0)+1; saveEvents(); render(); });
     document.getElementById('custMinus').addEventListener('click', () => { ev.custCount = Math.max(0,(ev.custCount||0)-1); saveEvents(); render(); });
 
-    stagingRows.forEach((row, idx) => {
+    document.getElementById('stg-date').addEventListener('input', e => staging.date = e.target.value);
+    document.getElementById('stg-time').addEventListener('input', e => staging.time = e.target.value);
+
+    staging.rows.forEach((row, idx) => {
       const prefix = `sr-${idx}-`;
-      document.getElementById(prefix+'date').addEventListener('input', e => row.date = e.target.value);
-      document.getElementById(prefix+'time').addEventListener('input', e => row.time = e.target.value);
       document.getElementById(prefix+'category').addEventListener('change', e => row.category = e.target.value);
       document.getElementById(prefix+'name').addEventListener('input', e => row.itemName = e.target.value);
       document.getElementById(prefix+'value').addEventListener('input', e => row.value = e.target.value);
+      document.getElementById(prefix+'promo').addEventListener('change', e => row.promo = e.target.checked);
       document.getElementById(prefix+'dup').addEventListener('click', () => {
-        stagingRows.splice(idx+1, 0, { id: uid(), date: row.date, time: row.time, category: row.category, itemName: row.itemName, value: row.value });
+        staging.rows.splice(idx+1, 0, { id: uid(), category: row.category, itemName: row.itemName, value: row.value, promo: row.promo });
         render();
       });
       const removeBtn = document.getElementById(prefix+'remove');
       if(removeBtn){
         removeBtn.addEventListener('click', () => {
-          stagingRows.splice(idx,1);
-          if(stagingRows.length===0) stagingRows.push(blankRow());
+          staging.rows.splice(idx,1);
+          if(staging.rows.length===0) staging.rows.push(blankItemRow());
           render();
         });
       }
     });
 
     document.getElementById('addItemBtn').addEventListener('click', () => {
-      stagingRows.push(blankRow());
+      staging.rows.push(blankItemRow());
       render();
     });
 
     document.getElementById('logEntryBtn').addEventListener('click', () => {
-      const valid = stagingRows.filter(r => r.itemName.trim() && parseFloat(r.value) > 0 && r.date);
+      const valid = staging.rows.filter(r => r.itemName.trim());
       if(valid.length === 0){
-        showMsg('Add at least one item with a name and dollar value.', true);
+        showMsg('Add at least one item with a name.', true);
         return;
       }
-      valid.forEach(r => {
-        ev.items.push({
-          id: uid(), date: r.date, time: r.time, category: r.category,
-          itemName: r.itemName.trim(), value: parseFloat(r.value)
-        });
-      });
-      ev.items.sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
+      if(!staging.date){
+        showMsg('Add a date for this entry.', true);
+        return;
+      }
+      const entry = {
+        id: uid(),
+        date: staging.date,
+        time: staging.time,
+        items: valid.map(r => ({
+          id: uid(),
+          category: r.category,
+          itemName: r.itemName.trim(),
+          value: parseFloat(r.value) || 0,
+          promo: !!r.promo
+        }))
+      };
+      ev.entries.push(entry);
+      ev.entries.sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
       saveEvents();
-      stagingRows = [ blankRow() ];
+      staging = freshStaging();
       showMsg(`Logged ${valid.length} item${valid.length===1?'':'s'}.`, false);
       render();
     });
 
-    app.querySelectorAll('.ticket .icon-btn.dup').forEach(btn => {
+    // duplicate a logged item into the staging area
+    app.querySelectorAll('.icon-btn.dup').forEach(btn => {
       btn.addEventListener('click', () => {
-        const item = ev.items.find(i => i.id === btn.getAttribute('data-id'));
+        const entryId = btn.getAttribute('data-entry-id');
+        const itemId = btn.getAttribute('data-item-id');
+        const entry = ev.entries.find(en => en.id === entryId);
+        const item = entry && entry.items.find(i => i.id === itemId);
         if(!item) return;
-        stagingRows.push({ id: uid(), date: todayStr(), time: nowTimeStr(), category: item.category, itemName: item.itemName, value: String(item.value) });
+        staging.rows.push({ id: uid(), category: item.category, itemName: item.itemName, value: String(item.value), promo: item.promo });
         render();
         const stageEl = document.getElementById('stagingArea');
         if(stageEl) stageEl.scrollIntoView({ behavior:'smooth', block:'center' });
       });
     });
-    app.querySelectorAll('.ticket .icon-btn.del').forEach(btn => {
+
+    // delete a single item from a logged entry (removes entry if it becomes empty)
+    app.querySelectorAll('.icon-btn.del').forEach(btn => {
       btn.addEventListener('click', () => {
-        ev.items = ev.items.filter(i => i.id !== btn.getAttribute('data-id'));
+        const entryId = btn.getAttribute('data-entry-id');
+        const itemId = btn.getAttribute('data-item-id');
+        const entry = ev.entries.find(en => en.id === entryId);
+        if(!entry) return;
+        entry.items = entry.items.filter(i => i.id !== itemId);
+        if(entry.items.length === 0){
+          ev.entries = ev.entries.filter(en => en.id !== entryId);
+        }
         saveEvents();
         render();
       });
+    });
+
+    // delete an entire entry at once
+    app.querySelectorAll('.entry-del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const entryId = btn.getAttribute('data-entry-id');
+        const entry = ev.entries.find(en => en.id === entryId);
+        if(!entry) return;
+        if(confirm(`Delete this entry (${entry.items.length} item${entry.items.length===1?'':'s'})?`)){
+          ev.entries = ev.entries.filter(en => en.id !== entryId);
+          saveEvents();
+          render();
+        }
+      });
+    });
+
+    document.getElementById('deleteEventBtn').addEventListener('click', () => {
+      const confirmed = confirm(`Delete "${ev.name}" and all ${itemCount} logged item(s)? This cannot be undone.`);
+      if(confirmed){
+        events = events.filter(e => e.id !== ev.id);
+        saveEvents();
+        view = 'home';
+        currentEventId = null;
+        render();
+      }
     });
   }
 
@@ -616,8 +755,6 @@
     const prefix = `sr-${idx}-`;
     return `
       <div class="stage-row">
-        <div class="field"><label>Date</label><input type="date" id="${prefix}date" value="${row.date}"></div>
-        <div class="field"><label>Time</label><input type="time" id="${prefix}time" value="${row.time}"></div>
         <div class="field">
           <label>Category</label>
           <select id="${prefix}category">
@@ -627,6 +764,10 @@
         </div>
         <div class="field"><label>Item name</label><input type="text" id="${prefix}name" value="${escapeAttr(row.itemName)}" placeholder="e.g. 20V cordless drill kit"></div>
         <div class="field"><label>Value ($)</label><input type="number" id="${prefix}value" value="${row.value}" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="promo-check">
+          <input type="checkbox" id="${prefix}promo" ${row.promo ? 'checked' : ''}>
+          <label for="${prefix}promo">This item was a promo</label>
+        </div>
         <div class="row-btn-group">
           <button class="row-btn" id="${prefix}dup" title="Duplicate this row">Duplicate</button>
           <button class="row-btn remove" id="${prefix}remove" title="Remove row">✕</button>
@@ -635,33 +776,45 @@
     `;
   }
 
-  function escapeAttr(str){
-    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-  }
-
-  function renderTickets(items){
+  function renderEntryTickets(entries){
     let html = '';
     let lastDate = null;
-    items.forEach(i => {
-      if(i.date !== lastDate){
-        const d = new Date(i.date + 'T00:00:00');
+    entries.forEach(entry => {
+      if(entry.date !== lastDate){
+        const d = new Date(entry.date + 'T00:00:00');
         const label = d.toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric', year:'numeric'});
         html += `<div class="day-heading">${label}</div>`;
-        lastDate = i.date;
+        lastDate = entry.date;
       }
+      const entryTotal = entry.items.reduce((s,i)=>s+i.value,0);
       html += `
-        <div class="ticket ${catClass(i.category)}">
+        <div class="ticket">
           <div class="stub-left"></div>
           <div class="stub-body">
-            <div class="t-main">
-              <div class="t-name">${escapeHtml(i.itemName)}</div>
-              <div class="t-meta"><span class="cat-pill">${i.category}</span>${i.time || ''}</div>
+            <div class="entry-header">
+              <div>
+                <div class="e-datetime mono">${fmtTime(entry.time)}</div>
+                <div class="e-meta">${entry.items.length} item${entry.items.length===1?'':'s'}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <div class="e-total mono">${fmtMoney(entryTotal)}</div>
+                <button class="entry-del-btn" data-entry-id="${entry.id}" title="Delete this entry">✕</button>
+              </div>
             </div>
-            <div class="t-right">
-              <div class="t-value mono">${fmtMoney(i.value)}</div>
-              <button class="icon-btn dup" data-id="${i.id}" title="Duplicate">⧉</button>
-              <button class="icon-btn del" data-id="${i.id}" title="Delete">✕</button>
-            </div>
+            ${entry.items.map(item => `
+              <div class="item-line ${catClass(item.category)}">
+                <div class="i-left">
+                  <span class="cat-pill">${item.category === 'Outdoor Power' ? 'Outdoor' : 'Tools'}</span>
+                  <span class="i-name">${escapeHtml(item.itemName)}</span>
+                  ${item.promo ? '<span class="promo-badge" title="Promo item">🏷️</span>' : ''}
+                </div>
+                <div class="i-right">
+                  <div class="i-value mono">${fmtMoney(item.value)}</div>
+                  <button class="icon-btn dup" data-entry-id="${entry.id}" data-item-id="${item.id}" title="Duplicate">⧉</button>
+                  <button class="icon-btn del" data-entry-id="${entry.id}" data-item-id="${item.id}" title="Delete">✕</button>
+                </div>
+              </div>
+            `).join('')}
           </div>
         </div>
       `;
@@ -684,6 +837,7 @@
   loadEvents();
 })();
 </script>
+
 
 </body>
 </html>
