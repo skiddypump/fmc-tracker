@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Field Sales Log</title>
+<style>
+  :root{
+    --bg:#1E2126;
+    --bg-panel:#262A31;
+    --bg-panel-2:#2C3138;
+    --text:#F0EBE0;
+    --text-dim:#9AA1AC;
+    --accent:#E8A33D;
+    --accent-dim:#8A6B34;
+    --accent-2:#5D8AB0;
+    --success:#6B9B6E;
+    --border:#383D45;
+    --ticket-bg:#F0EBE0;
+    --ticket-text:#23262B;
+    --ticket-text-dim:#6B6558;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:transparent;color:var(--text);}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:28px 20px 60px;
+    max-width:920px;
+    margin:0 auto;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;}
+  button{font-family:inherit;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:14px;
+    margin-bottom:22px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .brand-mark{display:flex;align-items:center;gap:12px;}
+  .brand-mark .swatch{
+    width:34px;height:34px;background:var(--accent);border-radius:4px;
+    display:flex;align-items:center;justify-content:center;color:#20242A;
+    font-weight:800;font-size:15px;transform:rotate(-3deg);
+  }
+  h1{font-size:22px;letter-spacing:0.06em;text-transform:uppercase;font-weight:800;margin:0;}
+  .subtitle{color:var(--text-dim);font-size:12.5px;margin-top:2px;}
+  .stamp{font-size:11px;color:var(--text-dim);text-align:right;line-height:1.5;}
+  .stamp b{color:var(--accent);}
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin-bottom:20px;
+  }
+  .panel h2{
+    font-size:12px;text-transform:uppercase;letter-spacing:0.09em;
+    color:var(--accent);margin:0 0 14px 0;display:flex;align-items:center;gap:8px;
+  }
+  .panel h2::before{content:"";width:8px;height:8px;background:var(--accent);display:inline-block;transform:rotate(45deg);}
+
+  .btn{
+    background:var(--accent);color:#20242A;border:none;font-weight:800;
+    text-transform:uppercase;letter-spacing:0.05em;font-size:12px;
+    padding:10px 18px;border-radius:6px;cursor:pointer;
+  }
+  .btn:hover{background:#f0b256;}
+  .btn:disabled{opacity:0.5;cursor:default;}
+  .btn.secondary{background:var(--bg-panel-2);color:var(--text);border:1px solid var(--border);}
+  .btn.secondary:hover{background:#343a42;}
+  .btn.small{padding:6px 12px;font-size:10.5px;}
+  .btn.ghost{background:none;border:1px solid var(--border);color:var(--text-dim);}
+  .btn.ghost:hover{color:var(--text);border-color:var(--accent);}
+
+  /* ---------- HOME / EVENT LIST ---------- */
+  .top-actions{display:flex;justify-content:flex-end;margin-bottom:16px;}
+  .new-event-form{
+    display:grid;grid-template-columns:2fr 1fr auto auto;gap:10px;align-items:end;
+  }
+  .field label{
+    display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;
+    color:var(--text-dim);margin-bottom:5px;
+  }
+  .field input, .field select{
+    width:100%;background:var(--bg-panel-2);border:1px solid var(--border);
+    border-radius:6px;color:var(--text);padding:9px 10px;font-size:14px;font-family:inherit;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .event-list{display:flex;flex-direction:column;gap:10px;}
+  .event-card{
+    background:var(--ticket-bg);color:var(--ticket-text);border-radius:8px;
+    display:flex;align-items:stretch;overflow:hidden;cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);border:none;text-align:left;width:100%;padding:0;
+  }
+  .event-card:hover{transform:translateY(-1px);}
+  .event-card .stub{width:10px;flex-shrink:0;background:var(--accent);}
+  .event-card .body{flex:1;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .event-card .name{font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.02em;}
+  .event-card .date{font-size:11px;color:var(--ticket-text-dim);margin-top:2px;}
+  .event-card .total{font-size:19px;font-weight:800;color:#8A6B34;}
+  .event-card .count{font-size:11px;color:var(--ticket-text-dim);text-align:right;}
+  .empty-note{color:var(--text-dim);font-size:12.5px;}
+
+  /* ---------- EVENT DETAIL ---------- */
+  .back-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .event-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .event-title h1{font-size:20px;}
+  .event-title .date-badge{font-size:11.5px;color:var(--text-dim);}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+  .card{background:var(--bg-panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;}
+  .card:nth-child(2){border-left-color:var(--accent-2);}
+  .card:nth-child(3){border-left-color:var(--success);}
+  .card .label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);}
+  .card .value{font-size:24px;font-weight:800;margin-top:4px;}
+
+  .counter-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
+  .counter{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;
+    padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+  }
+  .counter .c-label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);}
+  .counter .c-value{font-size:28px;font-weight:800;margin-top:2px;}
+  .counter .c-btns{display:flex;flex-direction:column;gap:6px;}
+  .plus-btn{
+    background:var(--accent);color:#20242A;border:none;border-radius:6px;
+    width:36px;height:36px;font-size:18px;font-weight:800;cursor:pointer;line-height:1;
+  }
+  .plus-btn:hover{background:#f0b256;}
+  .minus-btn{
+    background:var(--bg-panel-2);color:var(--text-dim);border:1px solid var(--border);border-radius:6px;
+    width:36px;height:22px;font-size:13px;cursor:pointer;line-height:1;
+  }
+  .minus-btn:hover{color:var(--text);}
+
+  /* staging rows */
+  .stage-row{
+    display:grid;
+    grid-template-columns:120px 90px 130px 1fr 110px auto auto;
+    gap:8px;align-items:end;margin-bottom:10px;
+  }
+  .stage-row .field{margin:0;}
+  .row-btn{
+    background:var(--bg-panel-2);border:1px solid var(--border);color:var(--text-dim);
+    border-radius:6px;padding:9px 10px;font-size:12px;cursor:pointer;height:37px;
+  }
+  .row-btn:hover{color:var(--text);border-color:var(--accent);}
+  .row-btn.remove:hover{color:#d9776b;border-color:#d9776b;}
+  .stage-actions{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px;flex-wrap:wrap;}
+  .stage-actions-left{display:flex;gap:10px;}
+  .form-msg{font-size:12px;color:var(--text-dim);}
+  .form-msg.error{color:#d9776b;}
+
+  /* logged items as tickets */
+  .tickets{display:flex;flex-direction:column;gap:8px;}
+  .ticket{
+    background:var(--ticket-bg);color:var(--ticket-text);border-radius:6px;
+    display:flex;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.25);overflow:hidden;
+  }
+  .ticket .stub-left{width:10px;flex-shrink:0;}
+  .ticket.tools .stub-left{background:var(--accent);}
+  .ticket.outdoor .stub-left{background:var(--accent-2);}
+  .ticket .stub-body{flex:1;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .ticket .t-main{display:flex;flex-direction:column;gap:2px;}
+  .ticket .t-name{font-weight:800;font-size:14px;}
+  .ticket .t-meta{font-size:11px;color:var(--ticket-text-dim);}
+  .ticket .t-meta .cat-pill{
+    display:inline-block;font-size:9.5px;text-transform:uppercase;letter-spacing:0.05em;
+    padding:1px 6px;border-radius:3px;margin-right:6px;font-weight:800;
+  }
+  .ticket.tools .cat-pill{background:var(--accent);color:#20242A;}
+  .ticket.outdoor .cat-pill{background:var(--accent-2);color:#101820;}
+  .ticket .t-right{display:flex;align-items:center;gap:10px;}
+  .ticket .t-value{font-size:16px;font-weight:800;}
+  .ticket .icon-btn{
+    background:none;border:1px solid #cfc7b4;color:#6B6558;border-radius:5px;
+    width:26px;height:26px;font-size:12px;cursor:pointer;line-height:1;
+  }
+  .ticket .icon-btn:hover{border-color:var(--ticket-text);color:var(--ticket-text);}
+  .ticket .icon-btn.del:hover{border-color:#8a2f2f;color:#8a2f2f;}
+
+  .day-heading{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:14px 0 8px;}
+  .day-heading:first-child{margin-top:0;}
+
+  footer{text-align:center;color:var(--text-dim);font-size:11px;margin-top:30px;}
+
+  @media (max-width:640px){
+    .stage-row{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<footer>Data is saved in this browser on this device only. Clearing browser data or switching browsers/phones will lose it — see the "back up your data" note if you add this to your home screen.</footer>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'sales-events';
+  let events = [];
+  let view = 'home'; // 'home' | 'event'
+  let currentEventId = null;
+  let stagingRows = [];
+  let showNewEventForm = false;
+
+  const app = document.getElementById('app');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function todayStr(){
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  function nowTimeStr(){
+    const d = new Date();
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function fmtMoney(n){
+    return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+  }
+  function catClass(cat){ return cat === 'Outdoor Power' ? 'outdoor' : 'tools'; }
+  function uid(){ return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+
+  function loadEvents(){
+    try{
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      events = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error('Could not read saved data', e);
+      events = [];
+    }
+    render();
+  }
+
+  function saveEvents(){
+    try{
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    }catch(e){
+      console.error('Could not save data', e);
+      alert('Could not save your data. Your browser storage may be full or disabled (e.g. private/incognito mode).');
+    }
+  }
+
+  function blankRow(){
+    return { id: uid(), date: todayStr(), time: nowTimeStr(), category: 'Tools', itemName: '', value: '' };
+  }
+
+  function newEventDefaultView(ev){
+    currentEventId = ev.id;
+    view = 'event';
+    stagingRows = [ blankRow() ];
+  }
+
+  /* ---------------- HOME ---------------- */
+  function renderHome(){
+    const totalStr = e => {
+      const t = e.items.reduce((s,i)=>s+i.value,0);
+      return fmtMoney(t);
+    };
+
+    app.innerHTML = `
+      <header>
+        <div class="brand-mark">
+          <div class="swatch">FS</div>
+          <div>
+            <h1>Field Sales Log</h1>
+            <div class="subtitle">Event-based retail activity tracker</div>
+          </div>
+        </div>
+        <div class="stamp">Status: <b>${events.length} event${events.length===1?'':'s'} logged</b></div>
+      </header>
+
+      <div class="top-actions">
+        <button class="btn secondary small" id="exportBtn">Export backup</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+        <button class="btn secondary small" id="importBtn">Import backup</button>
+        <button class="btn" id="newEventBtn">+ Create Event</button>
+      </div>
+
+      ${showNewEventForm ? `
+        <div class="panel">
+          <h2>New event</h2>
+          <div class="new-event-form">
+            <div class="field">
+              <label for="ne-name">Event name</label>
+              <input type="text" id="ne-name" placeholder="e.g. Home Depot #4021 — Spring Demo Day">
+            </div>
+            <div class="field">
+              <label for="ne-date">Date</label>
+              <input type="date" id="ne-date" value="${todayStr()}">
+            </div>
+            <button class="btn" id="createEventBtn">Create</button>
+            <button class="btn secondary" id="cancelEventBtn">Cancel</button>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="panel">
+        <h2>Events</h2>
+        <div class="event-list">
+          ${events.length === 0
+            ? '<div class="empty-note">No events yet — create one to start logging sales.</div>'
+            : events.slice().sort((a,b)=> b.date.localeCompare(a.date)).map(e => `
+              <button class="event-card" data-id="${e.id}">
+                <div class="stub"></div>
+                <div class="body">
+                  <div>
+                    <div class="name">${escapeHtml(e.name)}</div>
+                    <div class="date">${e.date} · ${e.items.length} item${e.items.length===1?'':'s'}</div>
+                  </div>
+                  <div>
+                    <div class="total mono">${totalStr(e)}</div>
+                    <div class="count">${e.assocCount||0} assoc · ${e.custCount||0} cust sessions</div>
+                  </div>
+                </div>
+              </button>
+            `).join('')
+          }
+        </div>
+      </div>
+    `;
+
+    document.getElementById('newEventBtn').addEventListener('click', () => {
+      showNewEventForm = !showNewEventForm;
+      render();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(events, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      a.href = url;
+      a.download = `field-sales-log-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => {
+      document.getElementById('importFile').click();
+    });
+
+    document.getElementById('importFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const imported = JSON.parse(reader.result);
+          if(!Array.isArray(imported)) throw new Error('Invalid file');
+          const merge = confirm(`Import ${imported.length} event(s)?\n\nOK = merge with existing data\nCancel = replace existing data entirely`);
+          if(merge){
+            imported.forEach(ie => {
+              if(!events.find(e => e.id === ie.id)) events.push(ie);
+            });
+          } else {
+            events = imported;
+          }
+          saveEvents();
+          render();
+        }catch(err){
+          alert('Could not read that file — make sure it\'s a backup exported from this app.');
+        }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    if(showNewEventForm){
+      document.getElementById('createEventBtn').addEventListener('click', () => {
+        const name = document.getElementById('ne-name').value.trim();
+        const date = document.getElementById('ne-date').value;
+        if(!name){ document.getElementById('ne-name').focus(); return; }
+        const ev = { id: uid(), name, date: date || todayStr(), assocCount:0, custCount:0, items: [] };
+        events.push(ev);
+        saveEvents();
+        showNewEventForm = false;
+        newEventDefaultView(ev);
+        render();
+      });
+      document.getElementById('cancelEventBtn').addEventListener('click', () => {
+        showNewEventForm = false;
+        render();
+      });
+    }
+
+    app.querySelectorAll('.event-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const ev = events.find(e => e.id === card.getAttribute('data-id'));
+        if(ev) newEventDefaultView(ev);
+        render();
+      });
+    });
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  /* ---------------- EVENT DETAIL ---------------- */
+  function renderEvent(){
+    const ev = events.find(e => e.id === currentEventId);
+    if(!ev){ view = 'home'; render(); return; }
+
+    const totalAll = ev.items.reduce((s,i)=>s+i.value,0);
+    const totalTools = ev.items.filter(i=>i.category==='Tools').reduce((s,i)=>s+i.value,0);
+    const totalOutdoor = ev.items.filter(i=>i.category==='Outdoor Power').reduce((s,i)=>s+i.value,0);
+
+    app.innerHTML = `
+      <div class="back-row">
+        <button class="btn ghost small" id="backBtn">&larr; All events</button>
+      </div>
+      <header>
+        <div class="event-title">
+          <h1>${escapeHtml(ev.name)}</h1>
+          <span class="date-badge">${ev.date}</span>
+        </div>
+        <div class="stamp">Status: <b>${ev.items.length} item${ev.items.length===1?'':'s'} logged</b></div>
+      </header>
+
+      <div class="cards">
+        <div class="card"><div class="label">Total $</div><div class="value mono">${fmtMoney(totalAll)}</div></div>
+        <div class="card"><div class="label">Total Tool $</div><div class="value mono">${fmtMoney(totalTools)}</div></div>
+        <div class="card"><div class="label">Total Outdoor $</div><div class="value mono">${fmtMoney(totalOutdoor)}</div></div>
+      </div>
+
+      <div class="counter-row">
+        <div class="counter">
+          <div>
+            <div class="c-label">Associate sessions</div>
+            <div class="c-value mono">${ev.assocCount||0}</div>
+          </div>
+          <div class="c-btns">
+            <button class="plus-btn" id="assocPlus">+</button>
+            <button class="minus-btn" id="assocMinus">−</button>
+          </div>
+        </div>
+        <div class="counter">
+          <div>
+            <div class="c-label">Customer sessions</div>
+            <div class="c-value mono">${ev.custCount||0}</div>
+          </div>
+          <div class="c-btns">
+            <button class="plus-btn" id="custPlus">+</button>
+            <button class="minus-btn" id="custMinus">−</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Add items</h2>
+        <div id="stagingArea">
+          ${stagingRows.map((row, idx) => stageRowHtml(row, idx)).join('')}
+        </div>
+        <div class="stage-actions">
+          <div class="stage-actions-left">
+            <button class="btn secondary small" id="addItemBtn">+ Add item</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="form-msg" id="formMsg"></span>
+            <button class="btn" id="logEntryBtn">Log entry</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Logged items</h2>
+        <div class="tickets" id="ticketList">
+          ${ev.items.length === 0 ? '<div class="empty-note">No items logged yet for this event.</div>' : renderTickets(ev.items)}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      view = 'home';
+      render();
+    });
+
+    document.getElementById('assocPlus').addEventListener('click', () => { ev.assocCount = (ev.assocCount||0)+1; saveEvents(); render(); });
+    document.getElementById('assocMinus').addEventListener('click', () => { ev.assocCount = Math.max(0,(ev.assocCount||0)-1); saveEvents(); render(); });
+    document.getElementById('custPlus').addEventListener('click', () => { ev.custCount = (ev.custCount||0)+1; saveEvents(); render(); });
+    document.getElementById('custMinus').addEventListener('click', () => { ev.custCount = Math.max(0,(ev.custCount||0)-1); saveEvents(); render(); });
+
+    stagingRows.forEach((row, idx) => {
+      const prefix = `sr-${idx}-`;
+      document.getElementById(prefix+'date').addEventListener('input', e => row.date = e.target.value);
+      document.getElementById(prefix+'time').addEventListener('input', e => row.time = e.target.value);
+      document.getElementById(prefix+'category').addEventListener('change', e => row.category = e.target.value);
+      document.getElementById(prefix+'name').addEventListener('input', e => row.itemName = e.target.value);
+      document.getElementById(prefix+'value').addEventListener('input', e => row.value = e.target.value);
+      document.getElementById(prefix+'dup').addEventListener('click', () => {
+        stagingRows.splice(idx+1, 0, { id: uid(), date: row.date, time: row.time, category: row.category, itemName: row.itemName, value: row.value });
+        render();
+      });
+      const removeBtn = document.getElementById(prefix+'remove');
+      if(removeBtn){
+        removeBtn.addEventListener('click', () => {
+          stagingRows.splice(idx,1);
+          if(stagingRows.length===0) stagingRows.push(blankRow());
+          render();
+        });
+      }
+    });
+
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      stagingRows.push(blankRow());
+      render();
+    });
+
+    document.getElementById('logEntryBtn').addEventListener('click', () => {
+      const valid = stagingRows.filter(r => r.itemName.trim() && parseFloat(r.value) > 0 && r.date);
+      if(valid.length === 0){
+        showMsg('Add at least one item with a name and dollar value.', true);
+        return;
+      }
+      valid.forEach(r => {
+        ev.items.push({
+          id: uid(), date: r.date, time: r.time, category: r.category,
+          itemName: r.itemName.trim(), value: parseFloat(r.value)
+        });
+      });
+      ev.items.sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
+      saveEvents();
+      stagingRows = [ blankRow() ];
+      showMsg(`Logged ${valid.length} item${valid.length===1?'':'s'}.`, false);
+      render();
+    });
+
+    app.querySelectorAll('.ticket .icon-btn.dup').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = ev.items.find(i => i.id === btn.getAttribute('data-id'));
+        if(!item) return;
+        stagingRows.push({ id: uid(), date: todayStr(), time: nowTimeStr(), category: item.category, itemName: item.itemName, value: String(item.value) });
+        render();
+        const stageEl = document.getElementById('stagingArea');
+        if(stageEl) stageEl.scrollIntoView({ behavior:'smooth', block:'center' });
+      });
+    });
+    app.querySelectorAll('.ticket .icon-btn.del').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ev.items = ev.items.filter(i => i.id !== btn.getAttribute('data-id'));
+        saveEvents();
+        render();
+      });
+    });
+  }
+
+  function stageRowHtml(row, idx){
+    const prefix = `sr-${idx}-`;
+    return `
+      <div class="stage-row">
+        <div class="field"><label>Date</label><input type="date" id="${prefix}date" value="${row.date}"></div>
+        <div class="field"><label>Time</label><input type="time" id="${prefix}time" value="${row.time}"></div>
+        <div class="field">
+          <label>Category</label>
+          <select id="${prefix}category">
+            <option value="Tools" ${row.category==='Tools'?'selected':''}>Tools</option>
+            <option value="Outdoor Power" ${row.category==='Outdoor Power'?'selected':''}>Outdoor Power</option>
+          </select>
+        </div>
+        <div class="field"><label>Item name</label><input type="text" id="${prefix}name" value="${escapeAttr(row.itemName)}" placeholder="e.g. 20V cordless drill kit"></div>
+        <div class="field"><label>Value ($)</label><input type="number" id="${prefix}value" value="${row.value}" min="0" step="0.01" placeholder="0.00"></div>
+        <button class="row-btn" id="${prefix}dup" title="Duplicate this row">Duplicate</button>
+        <button class="row-btn remove" id="${prefix}remove" title="Remove row">✕</button>
+      </div>
+    `;
+  }
+
+  function escapeAttr(str){
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  }
+
+  function renderTickets(items){
+    let html = '';
+    let lastDate = null;
+    items.forEach(i => {
+      if(i.date !== lastDate){
+        const d = new Date(i.date + 'T00:00:00');
+        const label = d.toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric', year:'numeric'});
+        html += `<div class="day-heading">${label}</div>`;
+        lastDate = i.date;
+      }
+      html += `
+        <div class="ticket ${catClass(i.category)}">
+          <div class="stub-left"></div>
+          <div class="stub-body">
+            <div class="t-main">
+              <div class="t-name">${escapeHtml(i.itemName)}</div>
+              <div class="t-meta"><span class="cat-pill">${i.category}</span>${i.time || ''}</div>
+            </div>
+            <div class="t-right">
+              <div class="t-value mono">${fmtMoney(i.value)}</div>
+              <button class="icon-btn dup" data-id="${i.id}" title="Duplicate">⧉</button>
+              <button class="icon-btn del" data-id="${i.id}" title="Delete">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    return html;
+  }
+
+  function showMsg(text, isError){
+    const el = document.getElementById('formMsg');
+    if(!el) return;
+    el.textContent = text;
+    el.className = 'form-msg' + (isError ? ' error' : '');
+  }
+
+  function render(){
+    if(view === 'home') renderHome();
+    else renderEvent();
+  }
+
+  loadEvents();
+})();
+</script>
+
+</body>
+</html>
